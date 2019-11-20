@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:orientation="vertical">
+
+        <!--机器状态-->
+        <LinearLayout
+            android:id="@+id/robot_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="机器状态"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/battery_percentage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="电池电量" />
+
+            <TextView
+                android:id="@+id/localization_quality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="定位质量" />
+
+            <TextView
+                android:id="@+id/action_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="运动状态" />
+
+            <TextView
+                android:id="@+id/software_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="固件版本" />
+
+            <TextView
+                android:id="@+id/robot_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="机器位姿" />
+
+        </LinearLayout> <!--机器状态-->
+
+        <!--机器设置-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="机器设置"
+                android:textStyle="bold" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="45dp">
+
+                <Button
+                    android:id="@+id/map_updata"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="暂停建图" />
+
+                <Button
+                    android:id="@+id/navigation_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="自由导航" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="45dp">
+
+                <Button
+                    android:id="@+id/go_home"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:text="回桩充电" />
+
+                <Button
+                    android:id="@+id/disconnect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:text="断开连接" />
+            </LinearLayout>
+
+        </LinearLayout><!--机器设置-->
+
+        <!--运动控制-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="运动控制"
+                android:textStyle="bold" />
+
+            <include
+                layout="@layout/action_control"
+                android:id="@+id/operation_view"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:layout_alignParentRight="true"
+                android:layout_weight="0" />
+
+        </LinearLayout><!--运动控制-->
+
+    </LinearLayout>
+
+</ScrollView>
