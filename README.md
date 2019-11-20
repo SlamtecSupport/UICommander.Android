@@ -23,5 +23,5 @@
 更多Slamaware Android Demo 请看[Slamaware Android Demo](https://github.com/SlamtecSupport/SlamwareApplicationDemos-Android)  
 
 # 软件下载
-请点击[UICommander.apk](https://github.com/SlamtecSupport/UICommander.Android/raw/master/apk/UIcommander.apk)  或扫描下方二维码下载。
+请点击[UICommander.apk](https://github.com/SlamtecSupport/UICommander.Android/raw/master/apk/UIcommander.apk)  或扫描下方二维码下载。  
 ![下载链接](pic/logo.png)
