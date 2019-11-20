@@ -21,3 +21,7 @@
 更多思岚科技的产品信息请参考[上海思岚科技](https://www.slamtec.com/)  
 更多Slamaware Android SDK 信息请看[Slamaware Android SDK](http://developer.slamtec.com/docs/slamware/android-sdk/2.6.0_rtm/)  
 更多Slamaware Android Demo 请看[Slamaware Android Demo](https://github.com/SlamtecSupport/SlamwareApplicationDemos-Android)  
+
+# 软件下载
+请点击[UICommander.apk](https://github.com/SlamtecSupport/UICommander.Android/raw/master/apk/UIcommander.apk)  或扫描下方二维码下载。
+![下载链接](pic/logo.png)
