@@ -65,8 +65,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="5dp">
+            android:layout_margin="5dp"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
@@ -114,14 +114,33 @@
                     android:text="断开连接" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="45dp">
+
+                <Button
+                    android:id="@+id/save_map"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:text="保存地图" />
+
+                <Button
+                    android:id="@+id/set_map"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:text="设置地图" />
+            </LinearLayout>
+
         </LinearLayout><!--机器设置-->
 
         <!--运动控制-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="5dp">
+            android:layout_margin="5dp"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
@@ -130,8 +149,8 @@
                 android:textStyle="bold" />
 
             <include
-                layout="@layout/action_control"
                 android:id="@+id/operation_view"
+                layout="@layout/action_control"
                 android:layout_width="match_parent"
                 android:layout_height="130dp"
                 android:layout_alignParentRight="true"

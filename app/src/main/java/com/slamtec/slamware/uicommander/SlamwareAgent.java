@@ -10,6 +10,7 @@ import com.slamtec.slamware.action.MoveDirection;
 import com.slamtec.slamware.action.Path;
 import com.slamtec.slamware.discovery.DeviceManager;
 import com.slamtec.slamware.geometry.Line;
+import com.slamtec.slamware.robot.CompositeMap;
 import com.slamtec.slamware.robot.HealthInfo;
 import com.slamtec.slamware.robot.LaserScan;
 import com.slamtec.slamware.robot.Location;
@@ -20,6 +21,7 @@ import com.slamtec.slamware.robot.Pose;
 import com.slamtec.slamware.uicommander.event.ActionStatusGetEvent;
 import com.slamtec.slamware.uicommander.event.ConnectedEvent;
 import com.slamtec.slamware.uicommander.event.ConnectionLostEvent;
+import com.slamtec.slamware.uicommander.event.GetCompositeMapEvent;
 import com.slamtec.slamware.uicommander.event.HomePoseGetEvent;
 import com.slamtec.slamware.uicommander.event.MapUpdataEvent;
 import com.slamtec.slamware.uicommander.event.LaserScanGetEvent;
@@ -77,6 +79,8 @@ public class SlamwareAgent {
     private static TaskGetTracks sTaskGetTracks;
     private static TaskGetRobotHealth sTaskGetRobotHealth;
     private static TaskClearRobotHealth sTaskClearRobotHealth;
+    private static TaskgetCompositeMap sTaskgetCompositeMap;
+    private static TaskSetCompositeMap sTaskSetCompositeMap;
 
     public SlamwareAgent() {
         mManager = ThreadManager.getInstance();
@@ -101,6 +105,8 @@ public class SlamwareAgent {
         sTaskClearRobotHealth = new TaskClearRobotHealth();
         sTaskGetMoveAction = new TaskGetMoveAction();
         sTaskMoveTo = new TaskMoveTo();
+        sTaskgetCompositeMap = new TaskgetCompositeMap();
+        sTaskSetCompositeMap = new TaskSetCompositeMap();
 
         mNavigationMode = NAVIGATION_MODE_FREE;
     }
@@ -226,26 +232,30 @@ public class SlamwareAgent {
         EventBus.getDefault().post(new ConnectionLostEvent());
     }
 
+    public void saveCompositeMap() {
+        pushTaskHead(sTaskgetCompositeMap);
+    }
+
+    public void setCompositeMap(CompositeMap compositeMap, Pose pose) {
+        sTaskSetCompositeMap.setCompositeMap(compositeMap);
+        sTaskSetCompositeMap.setPose(pose);
+        pushTaskHead(sTaskSetCompositeMap);
+    }
+
     //////////////////////////////////// Runnable //////////////////////////////////////////////////
     private class TaskConnect implements Runnable {
 
         @Override
         public void run() {
             try {
-                String ip;
-                synchronized (this) {
-                    ip = mIp;
-                }
-
-                if (ip == null || ip.isEmpty()) {
+                if (mIp == null || mIp.isEmpty()) {
                     onRequestError(new Exception("robot ip is empty"));
                     return;
                 }
 
                 synchronized (this) {
-                    mRobotPlatform = DeviceManager.connect(ip, ROBOT_PORT);
+                    mRobotPlatform = DeviceManager.connect(mIp, ROBOT_PORT);
                 }
-
             } catch (Exception exception) {
                 onRequestError(exception);
                 return;
@@ -735,6 +745,69 @@ public class SlamwareAgent {
             } catch (Exception e) {
                 onRequestError(e);
             }
+        }
+    }
+
+    private class TaskgetCompositeMap implements Runnable {
+        @Override
+        public void run() {
+            AbstractSlamwarePlatform platform;
+            synchronized (this) {
+                platform = mRobotPlatform;
+            }
+
+            if (platform == null) {
+                return;
+            }
+
+            CompositeMap compositeMap = null;
+            try {
+                compositeMap = platform.getCompositeMap();
+            } catch (Exception e) {
+                onRequestError(e);
+            }
+
+            EventBus.getDefault().post(new GetCompositeMapEvent(compositeMap));
+        }
+    }
+
+    private class TaskSetCompositeMap implements Runnable {
+
+        private CompositeMap compositeMap;
+        private Pose pose;
+
+        @Override
+        public void run() {
+            AbstractSlamwarePlatform platform;
+            synchronized (this) {
+                platform = mRobotPlatform;
+            }
+
+            if (platform == null) {
+                return;
+            }
+
+            try {
+                platform.setCompositeMap(compositeMap, pose);
+            } catch (Exception e) {
+                onRequestError(e);
+            }
+        }
+
+        public CompositeMap getCompositeMap() {
+            return compositeMap;
+        }
+
+        public void setCompositeMap(CompositeMap compositeMap) {
+            this.compositeMap = compositeMap;
+        }
+
+        public Pose getPose() {
+            return pose;
+        }
+
+        public void setPose(Pose pose) {
+            this.pose = pose;
         }
     }
 

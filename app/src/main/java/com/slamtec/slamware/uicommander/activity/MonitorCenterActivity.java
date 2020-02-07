@@ -1,22 +1,31 @@
 package com.slamtec.slamware.uicommander.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.slamtec.slamware.action.MoveDirection;
 import com.slamtec.slamware.action.Path;
 import com.slamtec.slamware.geometry.Line;
 import com.slamtec.slamware.geometry.PointF;
+import com.slamtec.slamware.robot.CompositeMap;
 import com.slamtec.slamware.robot.LaserScan;
 import com.slamtec.slamware.robot.Location;
 import com.slamtec.slamware.robot.Map;
 import com.slamtec.slamware.robot.Pose;
+import com.slamtec.slamware.sdp.CompositeMapHelper;
 import com.slamtec.slamware.uicommander.R;
 import com.slamtec.slamware.uicommander.event.ActionStatusGetEvent;
+import com.slamtec.slamware.uicommander.event.GetCompositeMapEvent;
 import com.slamtec.slamware.uicommander.event.RobotInfoEvent;
 import com.slamtec.slamware.uicommander.event.MapUpdataEvent;
 import com.slamtec.slamware.uicommander.event.RemainingMilestonesGetEvent;
@@ -39,10 +48,15 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.util.Date;
 import java.util.List;
+
+import static com.slamtec.slamware.uicommander.PathUtil.getPath;
 
 public class MonitorCenterActivity extends BaseActivity implements View.OnClickListener, LongClickButton.LongClickRepeatListener {
     private static final String TAG = "MonitorCenterActivity";
+    private static final String MAP_SDORE_PATH = Environment.getExternalStorageDirectory() + "/slamware/";
     final static String[] sNavigationModes = new String[]{"自由导航", "轨道导航", "轨道优先"};
 
     private MapView mMapView;
@@ -58,6 +72,8 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
     private Button mGoHome;
     private Button mButtonStop;
     private Button mButtonDisconnect;
+    private Button mButtonSetMap;
+    private Button mButtonSaveMap;
 
     private LongClickButton mButtonTurnLeft;
     private LongClickButton mButtonTurnRight;
@@ -76,7 +92,7 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
 
             while (true) {
                 if (mRobotStateUpdateRunnable == null || !mRobotStateUpdateThread.isAlive() || mRobotStateUpdateThread.isInterrupted()) {
-                    return;
+                    break;
                 }
 
                 if ((cnt % 3) == 0) {
@@ -120,7 +136,6 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
         super.onStart();
         EventBus.getDefault().register(this);
     }
-
 
     @Override
     protected void onStop() {
@@ -179,12 +194,16 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
         mButtonBackward = findViewById(R.id.button_backward);
         mButtonStop = findViewById(R.id.button_stop);
         mButtonDisconnect = findViewById(R.id.disconnect);
+        mButtonSetMap = findViewById(R.id.set_map);
+        mButtonSaveMap = findViewById(R.id.save_map);
 
         mMapUpdata.setOnClickListener(this);
         mNavigationMode.setOnClickListener(this);
         mGoHome.setOnClickListener(this);
         mButtonStop.setOnClickListener(this);
         mButtonDisconnect.setOnClickListener(this);
+        mButtonSetMap.setOnClickListener(this);
+        mButtonSaveMap.setOnClickListener(this);
         mButtonTurnLeft.setLongClickRepeatListener(this);
         mButtonTurnRight.setLongClickRepeatListener(this);
         mButtonForward.setLongClickRepeatListener(this);
@@ -315,6 +334,21 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventBackThread(GetCompositeMapEvent event) {
+        File jf = new File(MAP_SDORE_PATH);
+        if (!jf.exists()) {
+            jf.mkdirs();
+        }
+
+        String fileName = MAP_SDORE_PATH + new Date() + ".stcm";
+        CompositeMapHelper compositeMapHelper = new CompositeMapHelper();
+        String filePath = compositeMapHelper.saveFile(fileName, event.getCompositeMap());
+        if (filePath == null) {
+            Toast.makeText(this, "地图保存在" + fileName, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onClick(View v) {
@@ -333,6 +367,18 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
             case R.id.button_stop:
                 mAgent.cancelAllActions();
                 break;
+
+            case R.id.save_map:
+                mAgent.saveCompositeMap();
+                break;
+
+            case R.id.set_map:
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");//无类型限制
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(intent, 1);
+                break;
+
             case R.id.disconnect:
                 exit();
                 break;
@@ -361,4 +407,21 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            Uri uri = data.getData();
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
+                String path = getPath(this, uri);
+                if (path.endsWith(".stcm")) {
+                    CompositeMapHelper compositeMapHelper = new CompositeMapHelper();
+                    CompositeMap compositeMap1 = compositeMapHelper.loadFile(path);
+                    Pose pose = new Pose();
+                    getSlamwareAgent().setCompositeMap(compositeMap1, pose);
+                } else {
+                    Toast.makeText(this, "文件类型不对", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
 }

@@ -1,14 +1,21 @@
 package com.slamtec.slamware.uicommander.activity;
 
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.slamtec.slamware.uicommander.R;
 import com.slamtec.slamware.uicommander.SlamwareAgent;
@@ -23,6 +30,7 @@ public class ConnectActivity extends BaseActivity {
     private final static String TAG = "ConnectActivity";
     private static final String SP_FILE_NAME = "device_info";
     private static final String KEY_IP_ADDRESS = "ip_address";
+    private static final int CODE_FOR_WRITE_PERMISSION = 1234;
 
     private String mIpAddress;
     private SlamwareAgent mAgent;
@@ -54,6 +62,10 @@ public class ConnectActivity extends BaseActivity {
             saveDeviceInfo(mIpAddress);
             connectToDevice(mIpAddress);
         });
+
+        if (ContextCompat.checkSelfPermission(getApplication(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CODE_FOR_WRITE_PERMISSION);
+        }
     }
 
     @Override
@@ -125,5 +137,17 @@ public class ConnectActivity extends BaseActivity {
         hideConnectingDialog();
         gotoMonitorCenterActivity();
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == CODE_FOR_WRITE_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "获取权限失败，无法使用该软件", Toast.LENGTH_SHORT).show();
+                SystemClock.sleep(200);
+                finish();
+            }
+        }
+    }
+
 
 }
