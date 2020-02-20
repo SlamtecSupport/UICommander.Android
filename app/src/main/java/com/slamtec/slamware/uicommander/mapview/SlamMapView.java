@@ -120,7 +120,7 @@ public final class SlamMapView extends View {
 
     public void setMatrix(Matrix matrix) {
         mOuterMatrix = matrix;
-        invalidate();
+        postInvalidate();
     }
 
     private class Tile {

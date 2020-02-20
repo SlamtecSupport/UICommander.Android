@@ -30,7 +30,7 @@ public class RemainingPathView extends SlamwareBaseView {
 
     public void updateRemainingPath(Path remainingPath) {
         this.mRemainingPath = remainingPath;
-        invalidate();
+        postInvalidate();
     }
 
     @Override

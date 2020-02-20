@@ -44,7 +44,7 @@ public class DeviceView extends SlamwareBaseView {
     public void setDevicePose(Pose pose) {
         if (pose == null) return;
         mDevicePose = pose;
-        invalidate();
+        postInvalidate();
     }
 
     @Override

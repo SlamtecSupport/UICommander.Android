@@ -38,19 +38,19 @@ public abstract class SlamwareBaseView extends ViewGroup {
 
     public void setMatrix(Matrix mMatrix) {
         this.mMatrix = mMatrix;
-        invalidate();
+        postInvalidate();
     }
 
     public void setMatrixWithScale(Matrix matrix, float scale) {
         this.mMatrix = matrix;
         this.mScale = scale;
-        invalidate();
+        postInvalidate();
     }
 
     public void setMatrixWithRotation(Matrix matrix, float rotation) {
         this.mMatrix = matrix;
         this.mRotation += RadianUtil.toAngel(rotation);
-        invalidate();
+        postInvalidate();
     }
 
 }

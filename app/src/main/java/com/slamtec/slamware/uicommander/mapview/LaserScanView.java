@@ -50,7 +50,7 @@ public class LaserScanView extends SlamwareBaseView {
         if (laserScan == null) return;
 
         mLaserScan = laserScan;
-        invalidate();
+        postInvalidate();
     }
 
     @Override

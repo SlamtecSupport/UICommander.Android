@@ -27,7 +27,7 @@ public class HomeDockView extends SlamwareBaseView {
 
     public void setHomePose(Pose pose) {
         mHomePose = pose;
-        if (mHomePose != null) invalidate();
+        if (mHomePose != null) postInvalidate();
     }
 
     @Override

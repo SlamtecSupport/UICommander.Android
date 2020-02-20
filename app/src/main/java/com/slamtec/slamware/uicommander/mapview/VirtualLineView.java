@@ -37,7 +37,7 @@ public class VirtualLineView extends SlamwareBaseView {
     public void setLines(List<Line> lines) {
         mLines = lines;
 
-        invalidate();
+        postInvalidate();
     }
 
     @Override

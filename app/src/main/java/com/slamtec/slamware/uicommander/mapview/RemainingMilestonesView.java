@@ -32,7 +32,7 @@ public class RemainingMilestonesView extends SlamwareBaseView {
 
     public void updateRemainingMilestones(Path remainingMilestones) {
         this.mRemainingMilestones = remainingMilestones;
-        invalidate();
+        postInvalidate();
     }
 
     @Override

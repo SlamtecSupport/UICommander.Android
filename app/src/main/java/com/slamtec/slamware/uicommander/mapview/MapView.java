@@ -215,7 +215,7 @@ public class MapView extends FrameLayout implements SlamGestureDetector.OnRPGest
             mapLayer.setMatrix(matrix);
         }
 
-        invalidate();
+        postInvalidate();
     }
 
     private void setMatrixWithScale(Matrix matrix, float scale) {
@@ -385,11 +385,11 @@ public class MapView extends FrameLayout implements SlamGestureDetector.OnRPGest
 
     @Override
     public void invalidate() {
-        super.invalidate();
-        mSlamMapView.invalidate();
+        super.postInvalidate();
+        mSlamMapView.postInvalidate();
 
         for (SlamwareBaseView mapLayer : mapLayers) {
-            mapLayer.invalidate();
+            mapLayer.postInvalidate();
         }
     }
 
