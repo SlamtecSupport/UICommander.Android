@@ -534,7 +534,7 @@ public class SlamwareAgent {
 
             try {
                 MoveOption moveOption = new MoveOption();
-
+                moveOption.setMilestone(true);
                 switch (mNavigationMode) {
                     case NAVIGATION_MODE_FREE:
                         break;

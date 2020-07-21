@@ -32,6 +32,8 @@ import com.slamtec.slamware.uicommander.mapview.utils.RadianUtil;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.slamtec.slamware.uicommander.mapview.utils.MathUtils.inverseMatrixPoint;
 
@@ -46,6 +48,7 @@ public class MapView extends FrameLayout implements SlamGestureDetector.OnRPGest
     private float mMaxMapScale = 400;
     private float mMinMapScale = 0.1f;
 
+    private ExecutorService mExecutorService = Executors.newFixedThreadPool(1);
     private MapDataCache mMapData;
     private WeakReference<MapView> mMapView;
 
@@ -117,15 +120,12 @@ public class MapView extends FrameLayout implements SlamGestureDetector.OnRPGest
     private int mCnt = 0;
 
     public void setMap(Map map) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (map == null) return;
-                mMapData = new MapDataCache(map);
-                mSlamMapView.updateTiles(mMapData);
-                if (mCnt++ == 0) setCentred();
-            }
-        }).start();
+        mExecutorService.execute(() -> {
+            if (map == null) return;
+            mMapData = new MapDataCache(map);
+            mSlamMapView.updateTiles(mMapData);
+            if (mCnt++ == 0) setCentred();
+        });
     }
 
     public void setVwalls(List<Line> walls) {
