@@ -26,3 +26,9 @@
 # 软件下载
 请点击[UICommander.apk](https://github.com/SlamtecSupport/UICommander.Android/raw/master/apk/UIcommander.apk)  或扫描下方二维码下载。  
 ![下载链接](pic/logo.png)
+
+# MapView优化
+目前本软件中使用的地图更新方式为全局更新，该方式仅适用于小场景的地图，其绘制流程如下如所示。
+![全局更新地图](pic/MapView1.png)
+若用户Slamware导航方案使用的场景较大，将会导致地图也很大，此时再采用全局更新地图，getMap及创建BitMap耗时将会很大，会导致MapView闪屏，此时应当使用局部更新地图进行优化，每次getMap仅获取机器人周围局部范围的地图（RoboStudio为16M * 16M），局部更新地图的流程如下所示。
+![全局更新地图](pic/MapView2.png)
