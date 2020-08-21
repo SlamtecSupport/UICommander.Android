@@ -74,6 +74,8 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
     private Button mButtonDisconnect;
     private Button mButtonSetMap;
     private Button mButtonSaveMap;
+    private Button mButtonEnableSensor;
+    private Button mButtonDisableSensor;
 
     private LongClickButton mButtonTurnLeft;
     private LongClickButton mButtonTurnRight;
@@ -196,6 +198,8 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
         mButtonDisconnect = findViewById(R.id.disconnect);
         mButtonSetMap = findViewById(R.id.set_map);
         mButtonSaveMap = findViewById(R.id.save_map);
+        mButtonEnableSensor = findViewById(R.id.enable_sensor);
+        mButtonDisableSensor = findViewById(R.id.disable_sensor);
 
         mMapUpdata.setOnClickListener(this);
         mNavigationMode.setOnClickListener(this);
@@ -204,10 +208,13 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
         mButtonDisconnect.setOnClickListener(this);
         mButtonSetMap.setOnClickListener(this);
         mButtonSaveMap.setOnClickListener(this);
+        mButtonEnableSensor.setOnClickListener(this);
+        mButtonDisableSensor.setOnClickListener(this);
         mButtonTurnLeft.setLongClickRepeatListener(this);
         mButtonTurnRight.setLongClickRepeatListener(this);
         mButtonForward.setLongClickRepeatListener(this);
         mButtonBackward.setLongClickRepeatListener(this);
+
 
         mMapView.setSingleTapListener(event -> {
             PointF target = mMapView.widgetCoordinateToMapCoordinate(event.getX(), event.getY());
@@ -377,6 +384,14 @@ public class MonitorCenterActivity extends BaseActivity implements View.OnClickL
                 intent.setType("*/*");//无类型限制
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 startActivityForResult(intent, 1);
+                break;
+
+            case R.id.enable_sensor:
+                mAgent.enableAllSensor();
+                break;
+
+            case R.id.disable_sensor:
+                mAgent.disableAllSensor();
                 break;
 
             case R.id.disconnect:

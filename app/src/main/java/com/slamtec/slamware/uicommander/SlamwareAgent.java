@@ -11,13 +11,16 @@ import com.slamtec.slamware.action.Path;
 import com.slamtec.slamware.discovery.DeviceManager;
 import com.slamtec.slamware.geometry.Line;
 import com.slamtec.slamware.robot.CompositeMap;
+import com.slamtec.slamware.robot.GoHomeFlag;
 import com.slamtec.slamware.robot.HealthInfo;
+import com.slamtec.slamware.robot.ImpactSensorInfo;
 import com.slamtec.slamware.robot.LaserScan;
 import com.slamtec.slamware.robot.Location;
 import com.slamtec.slamware.robot.Map;
 import com.slamtec.slamware.robot.MapKind;
 import com.slamtec.slamware.robot.MoveOption;
 import com.slamtec.slamware.robot.Pose;
+import com.slamtec.slamware.robot.SensorMaskCtrlData;
 import com.slamtec.slamware.uicommander.event.ActionStatusGetEvent;
 import com.slamtec.slamware.uicommander.event.ConnectedEvent;
 import com.slamtec.slamware.uicommander.event.ConnectionLostEvent;
@@ -81,6 +84,7 @@ public class SlamwareAgent {
     private static TaskClearRobotHealth sTaskClearRobotHealth;
     private static TaskgetCompositeMap sTaskgetCompositeMap;
     private static TaskSetCompositeMap sTaskSetCompositeMap;
+    private static TaskConfigSensor sTaskConfigSensor;
 
     public SlamwareAgent() {
         mManager = ThreadManager.getInstance();
@@ -107,6 +111,7 @@ public class SlamwareAgent {
         sTaskMoveTo = new TaskMoveTo();
         sTaskgetCompositeMap = new TaskgetCompositeMap();
         sTaskSetCompositeMap = new TaskSetCompositeMap();
+        sTaskConfigSensor = new TaskConfigSensor();
 
         mNavigationMode = NAVIGATION_MODE_FREE;
     }
@@ -240,6 +245,16 @@ public class SlamwareAgent {
         sTaskSetCompositeMap.setCompositeMap(compositeMap);
         sTaskSetCompositeMap.setPose(pose);
         pushTaskHead(sTaskSetCompositeMap);
+    }
+
+    public void enableAllSensor() {
+        sTaskConfigSensor.setEnableSensor(true);
+        pushTaskHead(sTaskConfigSensor);
+    }
+
+    public void disableAllSensor() {
+        sTaskConfigSensor.setEnableSensor(false);
+        pushTaskHead(sTaskConfigSensor);
     }
 
     //////////////////////////////////// Runnable //////////////////////////////////////////////////
@@ -648,7 +663,7 @@ public class SlamwareAgent {
             if (platform == null) return;
 
             try {
-                platform.goHome();
+                platform.goHome(GoHomeFlag.Dock);
             } catch (Exception e) {
                 onRequestError(e);
             }
@@ -808,6 +823,41 @@ public class SlamwareAgent {
 
         public void setPose(Pose pose) {
             this.pose = pose;
+        }
+    }
+
+    private class TaskConfigSensor implements Runnable {
+        boolean isEnable;
+
+        public void setEnableSensor(boolean isEnable) {
+            this.isEnable = isEnable;
+        }
+
+        @Override
+        public void run() {
+            AbstractSlamwarePlatform platform;
+
+            synchronized (this) {
+                platform = mRobotPlatform;
+            }
+
+            if (platform == null) {
+                return;
+            }
+
+            try {
+                List<SensorMaskCtrlData> sensorMaskCtrlDatas = new ArrayList<SensorMaskCtrlData>();
+                List<ImpactSensorInfo> sensors = platform.getSensors();
+                for (int i = 0; i < sensors.size(); i++) {
+                    // fetch sensor id
+                    int sensorId = sensors.get(i).getSensorId();
+                    sensorMaskCtrlDatas.add(new SensorMaskCtrlData(sensorId, true, isEnable));
+                }
+
+                platform.setSensorMask(sensorMaskCtrlDatas);
+            } catch (Exception e) {
+                onRequestError(e);
+            }
         }
     }
 

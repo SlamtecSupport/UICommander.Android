@@ -133,6 +133,25 @@
                     android:text="设置地图" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="45dp">
+
+                <Button
+                    android:id="@+id/enable_sensor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:text="开传感器" />
+
+                <Button
+                    android:id="@+id/disable_sensor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:text="关传感器" />
+            </LinearLayout>
+
         </LinearLayout><!--机器设置-->
 
         <!--运动控制-->
